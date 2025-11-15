@@ -14,7 +14,9 @@ def K(f,u0,v0):
         [0,f,v0],
         [0,0,1]
     ])    
-
+# function de transformation
+def WTC(M, R, t):
+    return np.dot(R, M) + t
 
 
 
