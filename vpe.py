@@ -37,6 +37,13 @@ def K(f,u0,v0):
 def WTC(M, R, t):
     return np.dot(R, M) + t
 
+def project_point_camera(x, y, z, K):
+    if z <= 0:
+        return None
+    homog = np.array([x/z, y/z, 1])
+    m = np.dot(K, homog)
+    return int(m[0]), int(m[1])
+
 
 
 
