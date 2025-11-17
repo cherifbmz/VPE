@@ -44,7 +44,11 @@ def project_point_camera(x, y, z, K):
     m = np.dot(K, homog)
     return int(m[0]), int(m[1])
 
-
+def project_point_world(M, K, R, t):
+    X_cam = WTC(M, R, t)      
+    return project_point_camera(          
+        X_cam[0], X_cam[1], X_cam[2], K
+    )
 
 
 
