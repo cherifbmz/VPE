@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import pygame
 
 
 
@@ -27,7 +28,7 @@ def projection(x,y,z,K):
     v=int(m[1])
     return u,v
 
-def K(f,u0,v0):
+def K_matrice(f,u0,v0):
     return np.array([
         [f,0,u0],
         [0,f,v0],
@@ -50,6 +51,29 @@ def project_point_world(M, K, R, t):
         X_cam[0], X_cam[1], X_cam[2], K
     )
 
+
+
+
+def rotation_x(angle):
+    return np.array([
+        [1,0,0],
+        [0,np.cos(angle),-np.sin(angle)],
+        [0,np.sin(angle),np.cos(angle)]
+    ])
+
+def rotation_y(angle):
+    return np.array([
+        [np.cos(angle),0,np.sin(angle)],
+        [0,1,0],
+        [-np.sin(angle),0,np.cos(angle)]
+    ])
+
+def rotation_z(angle):
+    return np.array([
+        [np.cos(angle),-np.sin(angle),0],
+        [np.sin(angle),np.cos(angle),0],
+        [0, 0, 1]
+    ])
 
 
 
