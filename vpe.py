@@ -51,9 +51,6 @@ def project_point_world(M, K, R, t):
         X_cam[0], X_cam[1], X_cam[2], K
     )
 
-
-
-
 def rotation_x(angle):
     return np.array([
         [1,0,0],
@@ -77,3 +74,12 @@ def rotation_z(angle):
 
 
 
+
+
+def rotation_combinee(angle_x, angle_y, angle_z):
+
+    Rx = rotation_x(angle_x)  
+    Ry = rotation_y(angle_y)  
+    Rz = rotation_z(angle_z)   
+    
+    return np.dot(Rz, np.dot(Ry, Rx))  
