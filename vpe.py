@@ -102,3 +102,7 @@ def rotation_combinee(angle_x, angle_y, angle_z):
     
     return np.dot(Rz, np.dot(Ry, Rx))  
 
+
+
+def calculate_face_depth(face_vertices_3d):
+    return np.mean([v[2] for v in face_vertices_3d])
