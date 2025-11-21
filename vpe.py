@@ -106,3 +106,26 @@ def rotation_combinee(angle_x, angle_y, angle_z):
 
 def calculate_face_depth(face_vertices_3d):
     return np.mean([v[2] for v in face_vertices_3d])
+
+
+
+def main():
+    largeur_image, hauteur_image = 800,600
+    u_0,v_0 = largeur_image // 2,hauteur_image // 2
+    pygame.init()
+    fenetre=pygame.display.set_mode((largeur_image,hauteur_image))
+    noir=(0,0,0)
+    clock=pygame.time.Clock()
+    continuer=True
+    while continuer:
+        fenetre.fill(noir)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                continuer = False
+    pygame.quit()
+
+
+
+if __name__ == "__main__":
+    main()
+    
