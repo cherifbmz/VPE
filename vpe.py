@@ -5,9 +5,10 @@ import pygame
 
 
 class Representation3D:
-    def __init__(self, sommets, aretes):
+    def __init__(self, sommets, aretes,faces):
         self.sommets = np.array(sommets, dtype=float) 
-        self.aretes = aretes  
+        self.aretes = aretes
+        self.faces = faces  
 
 cube_sommets = [
     [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
@@ -18,7 +19,24 @@ cube_aretes = [
     (4,5),(5,6),(6,7),(7,4),
     (0,4),(1,5),(2,6),(3,7)
 ]
-CUBE = Representation3D(cube_sommets, cube_aretes)
+cube_faces = [
+    (0, 1, 2, 3),  
+    (4, 5, 6, 7),  
+    (0, 1, 5, 4),  
+    (2, 3, 7, 6),  
+    (0, 3, 7, 4),  
+    (1, 2, 6, 5)   
+]
+face_colors = [
+    (255, 0, 0),    
+    (0, 255, 0),    
+    (0, 0, 255),    
+    (255, 255, 0),  
+    (255, 0, 255),  
+    (0, 255, 255)   
+]
+
+CUBE = Representation3D(cube_sommets, cube_aretes,cube_faces)
 
 
 def projection(x,y,z,K):
@@ -83,3 +101,4 @@ def rotation_combinee(angle_x, angle_y, angle_z):
     Rz = rotation_z(angle_z)   
     
     return np.dot(Rz, np.dot(Ry, Rx))  
+
