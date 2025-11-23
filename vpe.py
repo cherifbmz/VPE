@@ -1,6 +1,8 @@
 import numpy as np
 import math
 import pygame
+import cv2
+
 
 
 
@@ -123,12 +125,25 @@ def main():
     angle_x=0
     angle_y=0
     angle_z=0
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     while continuer:
+        
+        
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_surface = pygame.image.frombuffer(
+        frame.tobytes(), frame.shape[1::-1], "RGB")
+        fenetre.blit(frame_surface, (0,0))
+        
+        
+        """"
         fenetre.fill(noir)
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 continuer=False
-
+        """
         angle_x=angle_x+ 0.01
         angle_y=angle_x+0.015
         angle_z=angle_z+0.008
