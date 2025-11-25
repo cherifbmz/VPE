@@ -93,9 +93,6 @@ def rotation_z(angle):
     ])
 
 
-
-
-
 def rotation_combinee(angle_x, angle_y, angle_z):
 
     Rx = rotation_x(angle_x)  
@@ -135,15 +132,14 @@ def main():
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_surface = pygame.image.frombuffer(
         frame.tobytes(), frame.shape[1::-1], "RGB")
-        fenetre.blit(frame_surface, (0,0))
+        fenetre.blit(frame_surface, (2,2))
         
         
-        """"
-        fenetre.fill(noir)
+        
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 continuer=False
-        """
+        
         angle_x=angle_x+ 0.01
         angle_y=angle_x+0.015
         angle_z=angle_z+0.008
@@ -181,8 +177,9 @@ def main():
 
         pygame.display.flip()
         clock.tick(60)
+    cap.release()
+    cv2.destroyAllWindows()
     pygame.quit()
-
 
 
 if __name__ == "__main__":
