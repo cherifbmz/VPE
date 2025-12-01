@@ -2,7 +2,7 @@ import numpy as np
 import math
 import pygame
 import cv2
-
+from threading import Thread
 
 
 
@@ -113,7 +113,6 @@ def main():
     u_0,v_0 = largeur_image // 2,hauteur_image // 2
     pygame.init()
     fenetre=pygame.display.set_mode((largeur_image,hauteur_image))
-    noir=(0,0,0)
     clock=pygame.time.Clock()
     continuer=True
     f=400
@@ -126,22 +125,31 @@ def main():
     while continuer:
         
         
-        ret, frame = cap.read()
+        ret, frame_bgr = cap.read()
         if not ret:
             break
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame_surface = pygame.image.frombuffer(
-        frame.tobytes(), frame.shape[1::-1], "RGB")
-        fenetre.blit(frame_surface, (2,2))
         
         
+        frame_bgr = cv2.resize(frame_bgr, (largeur_image, hauteur_image))
+        gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
+        gray_float = np.float32(gray)
+        dst = cv2.cornerHarris(gray_float, 2, 3, 0.04)
+        dst = cv2.dilate(dst, None)
+        frame_marked = frame_bgr.copy()
+        frame_marked[dst > 0.01 * dst.max()] = [0, 0, 255]
+
+        frame_rgb = cv2.cvtColor(frame_marked, cv2.COLOR_BGR2RGB)
+        frame_surface = pygame.image.frombuffer(frame_rgb.tobytes(), frame_rgb.shape[1::-1], "RGB")
+        fenetre.blit(frame_surface, (0, 0))
         
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
-                continuer=False
+                cap.release()
+                pygame.quit()
+                return
         
         angle_x=angle_x+ 0.01
-        angle_y=angle_x+0.015
+        angle_y=angle_y+0.015
         angle_z=angle_z+0.008
         R=rotation_combinee(angle_x, angle_y, angle_z)
         t=np.array([0,0,5])     
@@ -183,5 +191,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    t1 = Thread(target=main)
+    t1.start()
+    t1.join()
     
