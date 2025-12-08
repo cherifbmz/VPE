@@ -122,6 +122,10 @@ def main():
     angle_y=0
     angle_z=0
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    
+    chessboard_size = (7, 7)
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+
     while continuer:
         
         
@@ -132,18 +136,21 @@ def main():
         
         frame_bgr = cv2.resize(frame_bgr, (largeur_image, hauteur_image))
         gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
-        gray_float = np.float32(gray)
-        dst = cv2.cornerHarris(gray_float, 2, 3, 0.04)
-        dst = cv2.dilate(dst, None)
         frame_marked = frame_bgr.copy()
-        frame_marked[dst > 0.01 * dst.max()] = [0, 0, 255]
-
+        
+        ret_corners, corners = cv2.findChessboardCorners(gray, chessboard_size, None)
+        if ret_corners:
+            corners = cv2.cornerSubPix(gray, corners,winSize=(11, 11),zeroZone=(-1, -1), criteria=criteria)
+            for c in corners:
+                x, y = int(c[0][0]), int(c[0][1])
+                cv2.circle(frame_marked, (x, y), 6, (0, 0, 255), -1)
+    
         frame_rgb = cv2.cvtColor(frame_marked, cv2.COLOR_BGR2RGB)
         frame_surface = pygame.image.frombuffer(frame_rgb.tobytes(), frame_rgb.shape[1::-1], "RGB")
         fenetre.blit(frame_surface, (0, 0))
         
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
+            if event.type==pygame.QUIT: 
                 cap.release()
                 pygame.quit()
                 return
