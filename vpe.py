@@ -136,12 +136,12 @@ def main():
     f=400
     K=K_matrice(f,u_0,v_0)
     blanc=(255,255,255)
-    angle_x=0
-    angle_y=0
-    angle_z=0
+    R = np.eye(3)
+    t = np.array([0, 0, 5])
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
     
     chessboard_size = (7, 7)
+    square_size = 1.0
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
     while continuer:
@@ -159,6 +159,15 @@ def main():
         ret_corners, corners = cv2.findChessboardCorners(gray, chessboard_size, None)
         if ret_corners:
             corners = cv2.cornerSubPix(gray, corners,winSize=(11, 11),zeroZone=(-1, -1), criteria=criteria)
+            
+            R_estimated,t_estimated=calibrate_camera_from_chessboard(
+            corners,chessboard_size,square_size, K)
+            if R_estimated is not None:
+                R = R_estimated
+                t = t_estimated
+                calibrated = True
+            
+            
             for c in corners:
                 x, y = int(c[0][0]), int(c[0][1])
                 cv2.circle(frame_marked, (x, y), 6, (0, 0, 255), -1)
@@ -173,11 +182,7 @@ def main():
                 pygame.quit()
                 return
         
-        angle_x=angle_x+ 0.01
-        angle_y=angle_y+0.015
-        angle_z=angle_z+0.008
-        R=rotation_combinee(angle_x, angle_y, angle_z)
-        t=np.array([0,0,5])     
+             
 
 
         vertices_3d_camera=[]
