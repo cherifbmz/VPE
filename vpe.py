@@ -107,6 +107,24 @@ def calculate_face_depth(face_vertices_3d):
     return np.mean([v[2] for v in face_vertices_3d])
 
 
+def calibrate_camera_from_chessboard(corners_2d,chessboard_size,square_size,K): 
+    objp = np.zeros((chessboard_size[0]*chessboard_size[1],3),np.float32)
+    objp[:,:2]=np.mgrid[0:chessboard_size[0],0:chessboard_size[1]].T.reshape(-1,2)
+    objp*=square_size 
+    corners_2d_reshaped=corners_2d.reshape(-1,2).astype(np.float32)
+    success,rvec,tvec=cv2.solvePnP(
+        objp, 
+        corners_2d_reshaped, 
+        K, 
+        None,  
+        flags=cv2.SOLVEPNP_ITERATIVE
+    ) 
+    if success:
+        R, _ = cv2.Rodrigues(rvec)
+        t = tvec.flatten()
+        return R, t
+    else:
+        return None, None
 
 def main():
     largeur_image, hauteur_image = 800,600
