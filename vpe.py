@@ -157,6 +157,7 @@ def main():
         frame_marked = frame_bgr.copy()
         
         ret_corners, corners = cv2.findChessboardCorners(gray, chessboard_size, None)
+        calibrated = False
         if ret_corners:
             corners = cv2.cornerSubPix(gray, corners,winSize=(11, 11),zeroZone=(-1, -1), criteria=criteria)
             
@@ -181,37 +182,44 @@ def main():
                 cap.release()
                 pygame.quit()
                 return
-        
+
+
+        if calibrated:
+            cube_offset = np.array([chessboard_size[0] * square_size / 2, 
+                                   chessboard_size[1] * square_size / 2, 
+                                   2.0])
+                                   
              
 
 
-        vertices_3d_camera=[]
-        for M in CUBE.sommets:
-            X_cam = WTC(M,R,t)
-            vertices_3d_camera.append(X_cam)
+            vertices_3d_camera=[]
+            for M in CUBE.sommets:
+                M_world = M + cube_offset
+                X_cam = WTC(M_world,R,t)
+                vertices_3d_camera.append(X_cam)
 
-        points_2d=[]
-        for X_cam in vertices_3d_camera:
-            proj = project_point_camera(X_cam[0],X_cam[1],X_cam[2],K)
-            if proj is not None:
-                points_2d.append(proj)
-            else:
-                points_2d.append((-100,-100))
+            points_2d=[]
+            for X_cam in vertices_3d_camera:
+                proj = project_point_camera(X_cam[0],X_cam[1],X_cam[2],K)
+                if proj is not None:
+                    points_2d.append(proj)
+                else:
+                    points_2d.append((-100,-100))
         
 
-        faces_with_depth=[]
-        for i, face in enumerate(CUBE.faces):
-            face_verts_3d=[vertices_3d_camera[v] for v in face]
-            avg_depth=calculate_face_depth(face_verts_3d)
-            faces_with_depth.append((avg_depth,i,face)) 
+            faces_with_depth=[]
+            for i, face in enumerate(CUBE.faces):
+                face_verts_3d=[vertices_3d_camera[v] for v in face]
+                avg_depth=calculate_face_depth(face_verts_3d)
+                faces_with_depth.append((avg_depth,i,face)) 
 
 
-        faces_with_depth.sort(reverse=True,key=lambda x:x[0])
-        for depth,face_idx,face in faces_with_depth:
-            face_points_2d=[points_2d[v] for v in face]
-            if all(p[0]>= -100 and p[1] >= -100 for p in face_points_2d):   
-                pygame.draw.polygon(fenetre,face_colors[face_idx],face_points_2d)
-                pygame.draw.polygon(fenetre, blanc,face_points_2d,2)
+            faces_with_depth.sort(reverse=True,key=lambda x:x[0])
+            for depth,face_idx,face in faces_with_depth:
+                face_points_2d=[points_2d[v] for v in face]
+                if all(p[0]>= -100 and p[1] >= -100 for p in face_points_2d):   
+                    pygame.draw.polygon(fenetre,face_colors[face_idx],face_points_2d)
+                    pygame.draw.polygon(fenetre, blanc,face_points_2d,2)
 
         pygame.display.flip()
         clock.tick(60)
